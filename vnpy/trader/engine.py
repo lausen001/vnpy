@@ -10,40 +10,16 @@ from collections.abc import Callable
 
 from vnpy.event import Event, EventEngine
 from .app import BaseApp
-from .event import (
-    EVENT_TICK,
-    EVENT_ORDER,
-    EVENT_TRADE,
-    EVENT_POSITION,
-    EVENT_ACCOUNT,
-    EVENT_CONTRACT,
-    EVENT_LOG,
-    EVENT_QUOTE
-)
+from .event import (EVENT_TICK, EVENT_ORDER, EVENT_TRADE, EVENT_POSITION, EVENT_ACCOUNT, EVENT_CONTRACT, EVENT_LOG,
+                    EVENT_QUOTE)
 from .gateway import BaseGateway
-from .object import (
-    CancelRequest,
-    LogData,
-    OrderRequest,
-    QuoteData,
-    QuoteRequest,
-    SubscribeRequest,
-    HistoryRequest,
-    OrderData,
-    BarData,
-    TickData,
-    TradeData,
-    PositionData,
-    AccountData,
-    ContractData,
-    Exchange
-)
+from .object import (CancelRequest, LogData, OrderRequest, QuoteData, QuoteRequest, SubscribeRequest, HistoryRequest,
+                     OrderData, BarData, TickData, TradeData, PositionData, AccountData, ContractData, Exchange)
 from .setting import SETTINGS
 from .utility import TRADER_DIR
 from .converter import OffsetConverter
 from .logger import logger, DEBUG, INFO, WARNING, ERROR, CRITICAL
 from .locale import _
-
 
 EngineType = TypeVar("EngineType", bound="BaseEngine")
 
@@ -88,14 +64,14 @@ class MainEngine:
         self.apps: dict[str, BaseApp] = {}
         self.exchanges: list[Exchange] = []
 
-        os.chdir(TRADER_DIR)    # Change working directory
-        self.init_engines()     # Initialize function engines
+        os.chdir(TRADER_DIR)  # Change working directory
+        self.init_engines()  # Initialize function engines
 
     def add_engine(self, engine_class: type[EngineType]) -> EngineType:
         """
         Add function engine.
         """
-        engine: EngineType = engine_class(self, self.event_engine)      # type: ignore
+        engine: EngineType = engine_class(self, self.event_engine)  # type: ignore
         self.engines[engine.engine_name] = engine
         return engine
 
@@ -151,7 +127,8 @@ class MainEngine:
         self.get_all_active_orders: Callable[[], list[OrderData]] = oms_engine.get_all_active_orders
         self.get_all_active_quotes: Callable[[], list[QuoteData]] = oms_engine.get_all_active_quotes
         self.update_order_request: Callable[[OrderRequest, str, str], None] = oms_engine.update_order_request
-        self.convert_order_request: Callable[[OrderRequest, str, bool, bool], list[OrderRequest]] = oms_engine.convert_order_request
+        self.convert_order_request: Callable[[OrderRequest, str, bool, bool],
+                                             list[OrderRequest]] = oms_engine.convert_order_request
         self.get_converter: Callable[[str], OffsetConverter | None] = oms_engine.get_converter
 
         email_engine: EmailEngine = self.add_engine(EmailEngine)
@@ -216,6 +193,7 @@ class MainEngine:
         """
         gateway: BaseGateway | None = self.get_gateway(gateway_name)
         if gateway:
+            self.write_log(f"连接{gateway_name}...")
             gateway.connect(setting)
 
     def subscribe(self, req: SubscribeRequest, gateway_name: str) -> None:
@@ -528,13 +506,11 @@ class OmsEngine(BaseEngine):
         if converter:
             converter.update_order_request(req, vt_orderid)
 
-    def convert_order_request(
-        self,
-        req: OrderRequest,
-        gateway_name: str,
-        lock: bool,
-        net: bool = False
-    ) -> list[OrderRequest]:
+    def convert_order_request(self,
+                              req: OrderRequest,
+                              gateway_name: str,
+                              lock: bool,
+                              net: bool = False) -> list[OrderRequest]:
         """
         Convert original order request according to given mode.
         """
