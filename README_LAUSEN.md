@@ -90,3 +90,26 @@ pip install vnpy_spreadtrading vnpy_paperaccount vnpy_algotrading vnpy_optionmas
 ```
 translations: gettext.GNUTranslations | gettext.NullTranslations = gettext.translation("vnpy", localedir=localedir, languages=["zh_CN"], fallback=True)
 ```
+
+日志等级配置
+
+```
+CRITICAL = 50
+FATAL = CRITICAL
+ERROR = 40
+WARNING = 30
+WARN = WARNING
+INFO = 20
+DEBUG = 10
+NOTSET = 0
+```
+
+## 数据服务
+
+tushare 不是所有的接口都能使用，有积分要求。
+
+## 数据库
+
+sqlite数据库，database.database = database.db 固定名字。
+
+保存在 .vntrader 目录下面。
